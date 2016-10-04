@@ -1,0 +1,266 @@
+#include <stdio.h>
+
+typedef struct {
+	short x;
+	short y;
+}point;
+
+
+
+typedef struct gra{
+	short x;
+	short y;
+	struct gra * sig;
+} pline;
+
+
+
+
+typedef struct absisas{
+	short y1;
+	short y2;
+	struct absisas *sig;
+}cabsi;
+	
+
+typedef struct gc{
+	short x;
+	cabsi cy;	
+	pline  *linea;//puntos en x,y hasta y2 para cada "y" y "y2"
+}gconvex;
+
+#define INFINITO 0xffff
+#define VERTICAL INFINITO
+
+short m( point p2, point p1){
+	if  ( p2.x == p1.x ){
+		return	INFINITO; 
+	}
+	return (short ) ( ( p2.y- p1.y ) / ( p2.x - p1.x ) ) ;
+	}
+
+short   y( short m, short x, point p1){
+		return (short)  (   (    m *( x - p1.x )     )  + p1.y   ) ;
+	}
+
+pline *  linea( point p1, point p2 ){ //p1 < p2
+		pline *lin=NULL;
+		pline *retline ;
+		short x=p1.x +1;
+		short inclinacion_m= m( p2, p1 );
+		
+		for(; x < p2.x ; x++ ){
+			if( !lin ){
+				lin=( pline * ) malloc( sizeof( pline ) ) ;
+				retline=lin;
+			}else
+			{
+				lin->sig=( pline * ) malloc( sizeof(pline)  ) ;
+				lin=lin->sig;
+		 	lin->x=x;
+			lin->y=  y( inclinacion_m, x , p1);
+			lin->sig=NULL;
+			}
+		}
+		return  (  retline  );
+	}
+
+
+pline * inserta( pline nuevo, pline * conjunto ){
+       
+  pline *p=conjunto;
+
+  if( p ==NULL ) {
+
+    p=( pline * ) malloc( sizeof(pline) ) ;
+    p->x = nuevo.x;
+    p->y = nuevo.y;
+    p->sig = NULL;
+    return  p;
+  }
+
+  while( p->sig ){ //mientras el siguiente no sea null
+    p=p->sig ;     //pasarce al siguiente
+  }
+  
+  p=(pline * ) malloc( sizeof( pline) ) ;
+  p->x = nuevo.x ;
+  p->y = nuevo.y ; 
+  p->sig = NULL;
+  return p;
+  
+  
+}
+
+
+
+pline * buscar( pline pbuscado, pline * conjunto ){
+  pline *p=conjunto;
+
+
+  while( p ){  //cuando p es null termina;
+    if(  (  p->x == pbuscado.x  ) && ( p->y== pbuscado.y ) ) {
+      return p;
+    }
+    p=p->sig;
+  }
+  
+  return p ;
+}
+
+
+
+pline * buscarYs( pline pbuscado, pline * conjunto ){
+  pline *p=conjunto;
+
+  while( p ){
+        if(    ( p->x ==pbuscado.x ) && ( p->y > pbuscado.y ) ) {
+	  return  p;
+	}
+	p= p->sig ;
+  }
+
+  return p;
+}
+
+
+/*
+Funcion principal,recive 
+*/
+short    contarBorregosSeguros(  pline *conOvejas, pline *conEsquinas ){
+  
+  pline  *conO=  conOvejas ;
+  pline  *conE=  conEsquinas;
+  pline  *conP = NULL; 
+  pline  *conPuntos=NULL; //aqui estan todos los puntos
+  pline  *p;
+  point  p1, p2 ;
+  
+  short borregosSalvo=0;
+
+while( conE   ){ //todas las esqinas
+  
+  if( conP==NULL) {
+    conP= (pline * ) malloc( sizeof( pline) ) ;    
+    conP->sig=NULL;
+    conPuntos=conP ;
+  }else
+    {
+      conP->sig=( pline * )  malloc( sizeof( pline ) ) ;
+    }
+    conP->x = conE->x;
+    conP->y = conE->y;
+    
+    p1.x =conE->x;
+    p1.y =conE->y;
+    
+    p2.x =conE->x;
+    p2.y =conE->y;
+
+    conP->sig  =   linea(  p1 , p2  )         ; 
+    p= conP->sig;
+
+    while(  p->sig ) //hasta el ultimo punto de la linea, antes de p2
+      {
+	p=p->sig;
+      }
+    p->sig=(pline * ) malloc( sizeof( pline) ) ;
+    p=p->sig;
+    p->x= conE->sig->x;  
+    p->y= conE->sig->y;  //agregar el  extremo p2
+    
+    p->sig= NULL;
+    
+    conP=p;
+    
+
+    conE= conE->sig; //avanza siguiente esquina;
+}
+  
+/* conPuntos = conjunto de todos los puntos  */
+
+
+ p=conPuntos;
+
+ while ( p ){
+   printf( " %d,%d \n" , p->x, p->y ) ;
+   p=p->sig;
+ }
+
+
+
+  
+  
+  return  ( borregosSalvo  )  ;  
+
+  
+}
+
+
+ void imprimirConjunto(pline *con ){
+	pline *p=con;
+	while( p ){
+		printf("\(%d,%d\)  ",p->x, p->y) ;
+		p=p->sig;
+	}
+	return ;
+}
+
+lont cuentaConjunto( pline *con ){
+	long numero=0;
+	pline *p=con;
+	while( p ){
+		numero++;
+		p=p->sig;
+	}	
+return numero ;
+}
+
+
+int main()
+{
+  
+  FILE *input;
+  
+  short nOvejas=0;
+  short nEsquinas=0;
+  
+  short i=0;
+  
+ pline *ovejas=NULL;
+  pline *esquinas=NULL;
+  
+  point punto;
+  pline * conjuntoG=NULL ;
+  pline * conjuntoO=NULL;
+  
+   input=fopen("bahaa.in" , "r+t");
+ 
+  while ( !feof(input) ){
+    
+    fscanf( input, "%d %d", &nOvejas, &nEsquinas) ;
+    
+    for( i=0; i< nOvejas ; i++ ) {
+      fscanf( input, "%d %d", &punto.x, &punto.y ) ;
+    	inserta(punto, conjuntoO );
+    }  
+   	for( i=0 ; i< nEsquinas; i++ ){	
+		fscanf( input, "%d %d", &punto.x, &punto.y ) ;	
+		inserta( punto, esquinas );
+	}
+
+    
+  }
+  
+  imprimeConjuto( conjuntoO ) ;
+  imprimeConjunto( esquinas );
+  return 0 ; 
+}
+
+
+
+
+
+
+
+

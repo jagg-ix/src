@@ -1,0 +1,88 @@
+#include<stdio.h>
+#include <string.h>
+#include <math.h>
+#include <ctype.h>
+
+int main(){
+FILE *input;
+char cipher[100];
+char texto[100];
+char *p=NULL;
+
+input=fopen("datos.txt", "rt");
+
+/*
+fscanf(input,"%s",cipher);
+fscanf(input,"%s",texto ); 
+*/
+
+
+fgets(cipher,100,input);
+fgets(texto,100,input);
+
+p=cipher;
+while( *p!='\n'){
+	if( isupper( *p ) )
+	{
+		*p=toupper(*p) ;
+	} 	
+	p++;
+}
+*p='\0';
+
+p=texto;
+while( *p!='\n'){
+	if( isupper( *p ) )
+	{
+		*p=toupper(*p) ;
+	} 	
+	p++;
+}
+*p=0x0;
+
+p=cifrado( cipher,texto );
+
+
+fclose(input);
+free(p );
+return 0;
+}
+
+char cifrado( char *cipher, char *texto ){
+	char *cipherText=NULL;
+	unsigned int  longW=0;
+	unsigned int  longC=0;	
+
+	unsigned int i=0;
+	char *srcTexto=texto;
+	
+	
+	longW=strlen(srcTexto); 
+	longC=strlen(cipher);
+	
+	
+	cipherText=(char *) malloc(sizeof(char)*longW +1 ) ;
+	
+	
+	printf("Cipher: %s ,long=%d\n", cipher,strlen(cipher) );
+	//printf("Text:  %s  ,long=%d\n....",srcTexto,longW);
+	
+	//cipherText[longW+1]='\0';
+return cipherText;
+}
+
+char Simbolo(char *cipher, char *texto, unsigned int posicion){
+	
+	char caracter=0;
+	unsigned int i=0;
+	unsigned int longCipher=strlen(cipher);
+	unsigned int longTexto=strlen(cipher );
+	
+	//caracter=  (cipher[ posicion % longCipher    ] + texto[posicion] ) % 26 ;
+	//caracter=  cipher[ posicion % longCipher    ]  ;
+	printf("%n",posicion);	
+	//printf(" dentro de cifrado \n"); 
+	
+	
+return caracter ;
+}

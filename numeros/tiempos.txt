@@ -1,0 +1,16 @@
+ash-2.05b# time  ./p3.exe  > out.dat
+
+real    0m0.097s
+user    0m0.050s
+sys     0m0.000s
+bash-2.05b# time  ./p3.exe  > out.dat
+
+real    0m0.068s
+user    0m0.040s
+sys     0m0.010s
+bash-2.05b# time  ./p3.exe  > out2.dat
+
+real    0m0.097s
+user    0m0.050s
+sys     0m0.000s
+
